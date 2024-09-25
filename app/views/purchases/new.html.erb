@@ -1,0 +1,68 @@
+<%= form_with model: @purchase, url: purchases_path, local: true do |f| %>
+    <div class="row">
+      <div class="col-md-4">
+        <%= f.label :delivery_zipcode, "Zipcode" %>
+        <%= f.text_field :delivery_zipcode, class: "form-control", id: "zipcode" %>
+      </div>
+      <div class="col-md-4">
+        <%= f.label :delivery_state, "State" %>
+        <%= f.text_field :delivery_state, class: "form-control", readonly: true, id: "state" %>
+      </div>
+      <div class="col-md-4">
+        <%= f.label :delivery_city, "City" %>
+        <%= f.text_field :delivery_city, class: "form-control", readonly: true, id: "city" %>
+      </div>
+    </div>
+    
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <%= f.fields_for :order_items do |item_form| %>
+          <%= item_form.label :sku_code, "Select SKU" %>
+          <select name="<%= item_form.object_name %>[sku_code]" id="sku_code" class="form-control">
+           <option value="">Select SKU</option>
+            <% @souko_zaikos&.each do |sku| %>
+              <% if sku.stock > 0 %>
+                <option value="<%= sku.sku_code %>"><%= sku.sku_code %></option>
+              <% end %>
+          <% end %>
+          </select>
+          <%= item_form.number_field :quantity, class: "form-control", placeholder: "Quantity", min: 1, id: "quantity" %>
+          <%= item_form.number_field :price, class: "form-control", placeholder: "Price", min: 1, id: "price" %>
+          <%= item_form.hidden_field :total_amount, id: "total_amount" %>
+          <div id="total_price_display"></div>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-12 text-center">
+        <%= f.submit "Purchase", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+  
+  <script>
+    document.getElementById('zipcode').addEventListener('blur', function() {
+      const zipcode = this.value;
+      const formattedZipcode = `${zipcode.slice(0, 3)}-${zipcode.slice(3)}`;
+      fetch(` https://api.zipaddress.net/?zipcode=${formattedZipcode}`) // Replace with the actual API URL
+        .then(response => response.json())
+        .then(data => {
+          console.log(formattedZipcode)
+          document.getElementById('state').value = data?.data?.pref; // Example: "茨城県"
+          document.getElementById('city').value = data?.data?.city; // Example: "つくば市"
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+  
+    document.querySelectorAll('[id^="quantity"], [id^="price"]').forEach(element => {
+      element.addEventListener('input', function() {
+        const quantity = parseInt(document.getElementById('quantity').value) || 0;
+        const price = parseInt(document.getElementById('price').value) || 0;
+        const totalAmount = quantity * price;
+        document.getElementById('total_amount').value = totalAmount;
+        document.getElementById('total_price_display').innerText = "Total Amount: " + totalAmount;
+      });
+    });
+  </script>
+  

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ItemPurchaseApp</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <style>
+      .flash-message {
+        position: relative;
+        transition: opacity 0.5s ease;
+        margin: 10px 0; /* Adds some spacing */
+        background-color: #FFB6C1;
+        width: 15%;
+      }
+    </style>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          setTimeout(function() {
+          const flashMessages = document.querySelectorAll('.flash-message');
+          flashMessages.forEach(function(message) {
+          message.style.display = 'none'; // Hide the flash message
+        });
+      }, 2000); // 2000 milliseconds = 2 seconds
+    });
+  </script>
+  </head>
+
+  <body>
+    <% flash.each do |key, message| %>
+      <div class="alert alert-<%= key %> flash-message"><%= message %></div>
+    <% end %>
+    <%= yield %>
+  </body>
+</html>

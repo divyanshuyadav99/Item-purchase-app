@@ -1,0 +1,25 @@
+
+<h1>Order Items</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>SKU Code</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Total Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @order_items.each do |item| %>
+      <tr>
+        <td><%= item.sku_code %></td>
+        <td><%= item.quantity %></td>
+        <td><%= number_to_currency(item.price) %></td>
+        <td><%= number_to_currency(item.total_amount) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'Add New Order Item', new_purchase_path, class: 'btn btn-primary' %>
